@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/url"
 
+	_productHandler "project-version3/superindo-task/product/delivery/http"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
 	"github.com/spf13/viper"
@@ -64,7 +66,8 @@ func main() {
 
 	// timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	// au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext)
-	// _articleHttpDelivery.NewArticleHandler(e, au)
+	// _articleHttpDelivery.NewArticleHandler(e)
+	_productHandler.NewProductHandler(e)
 
 	log.Fatal(e.Start(viper.GetString("server.address"))) //nolint
 }
