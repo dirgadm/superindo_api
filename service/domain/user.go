@@ -14,7 +14,7 @@ type User struct {
 	Name        string
 	Phone       string
 	CreatedAt   time.Time
-	LastLoginAt time.Time `gorm:"column:last_login_at;type:datetime"`
+	LastLoginAt time.Time
 }
 
 func (m *User) TableName() string {

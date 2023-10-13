@@ -8,11 +8,8 @@ type ProductResponse struct {
 	Description   string                 `json:"description"`
 	Weight        float64                `json:"weight"`
 	Price         float64                `json:"price"`
-	OrderMinQty   int                    `json:"order_min_qty"`
-	OrderMaxQty   int                    `json:"order_max_qty"`
 	Status        int                    `json:"status"`
 	Stock         int                    `json:"stock"`
-	Discount      float64                `json:"discount"`
 	Category      CategoryResponse       `json:"category,omitempty"`
 	ProductImages []ProductImageResponse `json:"product_images,omitempty"`
 	CreatedAt     time.Time              `json:"created_at,omitempty"`

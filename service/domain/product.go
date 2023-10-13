@@ -1,29 +1,37 @@
 package domain
 
 import (
+	"context"
+	"project-version3/superindo-task/service/domain/dto"
 	"time"
 )
 
 // Product is representing the Product data struct
 type Product struct {
-	ID        int64     `json:"id"`
-	Title     string    `json:"title" validate:"required"`
-	Content   string    `json:"content" validate:"required"`
-	Author    int64     `json:"author"`
-	UpdatedAt time.Time `json:"updated_at"`
-	CreatedAt time.Time `json:"created_at"`
+	Id          int `gorm:"primaryKey;autoIncrement:true"`
+	Name        string
+	Description string
+	CategoryId  int
+	Weight      float64
+	Price       float64
+	Stock       int
+	Status      int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (m *Product) TableName() string {
+	return "product"
 }
 
 // ProductUsecase represent the article's usecases
 type ProductUsecase interface {
-	// Fetch(ctx context.Context, cursor string, num int64) ([]Product, string, error)
-	// GetByID(ctx context.Context, id int64) (Product, error)
-	// Store(context.Context, *Product) error
+	GetList(ctx context.Context, offset int, limit int, search string, categoryId int) (res []dto.ProductResponse, total int64, err error)
+	GetDetail(ctx context.Context, id int) (res dto.ProductResponse, err error)
 }
 
 // ProductRepository represent the article's repository contract
 type ProductRepository interface {
-	// Fetch(ctx context.Context, cursor string, num int64) (res []Product, nextCursor string, err error)
-	// GetByID(ctx context.Context, id int64) (Product, error)
-	// Store(ctx context.Context, a *Product) error
+	GetList(ctx context.Context, offset int, limit int, search string, categoryId int) (products []Product, count int64, err error)
+	GetDetail(ctx context.Context, id int) (product Product, err error)
 }

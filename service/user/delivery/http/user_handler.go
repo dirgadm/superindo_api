@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/labstack/echo"
+	"github.com/labstack/gommon/log"
 )
 
 // UserHandler  represent the httphandler for User
@@ -32,19 +33,19 @@ func (h UserHandler) Login(c echo.Context) (err error) {
 	var req dto.LoginRequest
 
 	if err = ctx.Bind(&req); err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 
 	if err = validator.Struct(req); err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 
 	ctx.ResponseData, err = h.PUsecase.Login(ctx.Request().Context(), req)
 
 	if err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 
@@ -58,18 +59,18 @@ func (h UserHandler) Register(c echo.Context) (err error) {
 	var req dto.RegisterRequest
 
 	if err = ctx.Bind(&req); err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 
 	if err = validator.Struct(req); err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 
 	ctx.ResponseData, err = h.PUsecase.Register(ctx.Request().Context(), req)
 	if err != nil {
-		// h.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return ctx.Serve(err)
 	}
 

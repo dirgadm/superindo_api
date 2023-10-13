@@ -5,57 +5,134 @@ import (
 	"time"
 
 	"project-version3/superindo-task/service/domain"
+	"project-version3/superindo-task/service/domain/dto"
+
+	"github.com/labstack/gommon/log"
 )
 
 type productUsecase struct {
-	productRepo domain.ProductRepository
-	// authorRepo     domain.AuthorRepository
-	contextTimeout time.Duration
+	productRepo      domain.ProductRepository
+	categoryRepo     domain.CategoryRepository
+	productImageRepo domain.ProductImageRepository
+	contextTimeout   time.Duration
 }
 
 // NewProductUsecase will create new an articleUsecase object representation of domain.ProductUsecase interface
-func NewProductUsecase(a domain.ProductRepository, timeout time.Duration) domain.ProductUsecase {
+func NewProductUsecase(u domain.ProductRepository, c domain.CategoryRepository, pi domain.ProductImageRepository, timeout time.Duration) domain.ProductUsecase {
 	return &productUsecase{
-		productRepo: a,
-		// authorRepo:     ar,
-		contextTimeout: timeout,
+		productRepo:      u,
+		categoryRepo:     c,
+		productImageRepo: pi,
+		contextTimeout:   timeout,
 	}
 }
 
-func (a *productUsecase) Fetch(c context.Context, cursor string, num int64) (res []domain.Product, nextCursor string, err error) {
-	// if num == 0 {
-	// 	num = 10
-	// }
+func (s *productUsecase) GetList(ctx context.Context, offset int, limit int, search string, categoryId int) (res []dto.ProductResponse, total int64, err error) {
+	var products []domain.Product
+	products, total, err = s.productRepo.GetList(ctx, offset, limit, search, categoryId)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 
-	// ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	// defer cancel()
+	for _, product := range products {
+		var category domain.Category
+		category, err = s.categoryRepo.GetDetail(ctx, product.CategoryId)
+		if err != nil {
+			log.Error(err)
+			return
+		}
 
-	// res, nextCursor, err = a.productRepo.Fetch(ctx, cursor, num)
-	// if err != nil {
-	// 	return nil, "", err
-	// }
+		var productImages []domain.ProductImage
+		productImages, _, err = s.productImageRepo.GetListByProductId(ctx, product.Id)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		var productImageResponse []dto.ProductImageResponse
+		for _, productImage := range productImages {
+			productImageResponse = append(productImageResponse, dto.ProductImageResponse{
+				Id:        productImage.Id,
+				ImageUrl:  productImage.ImageUrl,
+				MainImage: productImage.MainImage,
+			})
+		}
+
+		res = append(res, dto.ProductResponse{
+			Id:          product.Id,
+			Name:        product.Name,
+			Description: product.Description,
+			Weight:      product.Weight,
+			Price:       product.Price,
+			Stock:       product.Stock,
+			Status:      product.Status,
+			CreatedAt:   product.CreatedAt,
+			UpdatedAt:   product.UpdatedAt,
+			Category: dto.CategoryResponse{
+				Id:        category.Id,
+				Name:      category.Name,
+				IconUrl:   category.IconUrl,
+				CreatedAt: category.CreatedAt,
+				UpdatedAt: category.UpdatedAt,
+			},
+			ProductImages: productImageResponse,
+		})
+	}
+
 	return
 }
 
-func (a *productUsecase) GetByID(c context.Context, id int64) (res domain.Product, err error) {
-	// ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	// defer cancel()
+func (s *productUsecase) GetDetail(ctx context.Context, id int) (res dto.ProductResponse, err error) {
+	var product domain.Product
+	product, err = s.productRepo.GetDetail(ctx, id)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 
-	// res, err = a.productRepo.GetByID(ctx, id)
-	// if err != nil {
-	// 	return
-	// }
-	return
-}
+	var category domain.Category
+	category, err = s.categoryRepo.GetDetail(ctx, product.CategoryId)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 
-func (a *productUsecase) Store(c context.Context, m *domain.Product) (err error) {
-	// ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	// defer cancel()
-	// existedProduct, _ := a.GetByTitle(ctx, m.Title)
-	// if existedProduct != (domain.Product{}) {
-	// 	return domain.ErrConflict
-	// }
+	var productImages []domain.ProductImage
+	productImages, _, err = s.productImageRepo.GetListByProductId(ctx, product.Id)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 
-	// err = a.articleRepo.Store(ctx, m)
+	var productImageResponse []dto.ProductImageResponse
+	for _, productImage := range productImages {
+		productImageResponse = append(productImageResponse, dto.ProductImageResponse{
+			Id:        productImage.Id,
+			ImageUrl:  productImage.ImageUrl,
+			MainImage: productImage.MainImage,
+		})
+	}
+
+	res = dto.ProductResponse{
+		Id:          product.Id,
+		Name:        product.Name,
+		Description: product.Description,
+		Weight:      product.Weight,
+		Price:       product.Price,
+		Stock:       product.Stock,
+		Status:      product.Status,
+		CreatedAt:   product.CreatedAt,
+		UpdatedAt:   product.UpdatedAt,
+		Category: dto.CategoryResponse{
+			Id:        category.Id,
+			Name:      category.Name,
+			IconUrl:   category.IconUrl,
+			CreatedAt: category.CreatedAt,
+			UpdatedAt: category.UpdatedAt,
+		},
+		ProductImages: productImageResponse,
+	}
+
 	return
 }

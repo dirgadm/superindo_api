@@ -10,25 +10,25 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-// ProductHandler  represent the httphandler for Product
-type ProductHandler struct {
-	PUsecase domain.ProductUsecase
+// CategoryHandler  represent the httphandler for Category
+type CategoryHandler struct {
+	PUsecase domain.CategoryUsecase
 }
 
-// NewProductHandler will initialize the Product resources endpoint
-func NewProductHandler(e *echo.Echo, ps domain.ProductUsecase) {
-	handler := &ProductHandler{
+// NewCategoryHandler will initialize the Category resources endpoint
+func NewCategoryHandler(e *echo.Echo, ps domain.CategoryUsecase) {
+	handler := &CategoryHandler{
 		PUsecase: ps,
 	}
 	v1 := e.Group("v1")
 
 	mw := middleware.NewMiddleware()
 
-	v1.GET("/product", handler.GetList, mw.Authorized())
-	v1.GET("/product/:id", handler.GetDetail, mw.Authorized())
+	v1.GET("/category", handler.GetList, mw.Authorized())
+	v1.GET("/category/:id", handler.GetDetail, mw.Authorized())
 }
 
-func (h ProductHandler) GetList(c echo.Context) (err error) {
+func (h CategoryHandler) GetList(c echo.Context) (err error) {
 	ctx := c.(*ehttp.Context)
 
 	// get pagination
@@ -41,22 +41,21 @@ func (h ProductHandler) GetList(c echo.Context) (err error) {
 
 	// get params
 	search := ctx.GetParamString("search")
-	categoryId := ctx.GetParamInt("category_id")
 
-	var products []dto.ProductResponse
+	var categories []dto.CategoryResponse
 	var total int64
-	products, total, err = h.PUsecase.GetList(ctx.Request().Context(), page.Start, page.Limit, search, categoryId)
+	categories, total, err = h.PUsecase.GetList(ctx.Request().Context(), page.Start, page.Limit, search)
 	if err != nil {
 		log.Error(err)
 		return ctx.Serve(err)
 	}
 
-	ctx.DataList(products, total, page.Page, page.PerPage)
+	ctx.DataList(categories, total, page.Page, page.PerPage)
 
 	return ctx.Serve(err)
 }
 
-func (h ProductHandler) GetDetail(c echo.Context) (err error) {
+func (h CategoryHandler) GetDetail(c echo.Context) (err error) {
 	ctx := c.(*ehttp.Context)
 
 	var id int
@@ -66,14 +65,14 @@ func (h ProductHandler) GetDetail(c echo.Context) (err error) {
 		return
 	}
 
-	var product dto.ProductResponse
-	product, err = h.PUsecase.GetDetail(ctx.Request().Context(), id)
+	var category dto.CategoryResponse
+	category, err = h.PUsecase.GetDetail(ctx.Request().Context(), id)
 	if err != nil {
 		log.Error(err)
 		return ctx.Serve(err)
 	}
 
-	ctx.Data(product)
+	ctx.Data(category)
 
 	return ctx.Serve(err)
 }

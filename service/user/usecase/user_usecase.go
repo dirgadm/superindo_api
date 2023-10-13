@@ -9,6 +9,7 @@ import (
 	"project-version3/superindo-task/service/domain"
 	"project-version3/superindo-task/service/domain/dto"
 
+	"github.com/labstack/gommon/log"
 	"github.com/spf13/viper"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -31,14 +32,14 @@ func (u *userUsecase) Login(ctx context.Context, req dto.LoginRequest) (res dto.
 	var user domain.User
 	user, err = u.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		err = ehttp.ErrorOutput("email", err.Error())
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		err = ehttp.ErrorOutput("password", "The password is not match")
 		return
 	}
@@ -52,7 +53,7 @@ func (u *userUsecase) Login(ctx context.Context, req dto.LoginRequest) (res dto.
 
 	token, err := jwtInit.Create(claim)
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return
 	}
 
@@ -73,7 +74,7 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 	var userExist domain.User
 	userExist, _ = u.userRepo.GetByEmail(ctx, req.Email)
 	if userExist.Id != 0 {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		err = ehttp.ErrorOutput("email", "The email is already exists")
 		return
 	}
@@ -81,7 +82,7 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 	var bytes []byte
 	bytes, err = bcrypt.GenerateFromPassword([]byte(req.Password), 14)
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return
 	}
 	passwordHash := string(bytes)
@@ -95,7 +96,7 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 	}
 	err = u.userRepo.Create(ctx, user)
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return
 	}
 
@@ -108,7 +109,7 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 
 	token, err := jwtInit.Create(claim)
 	if err != nil {
-		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		log.Error(err)
 		return
 	}
 

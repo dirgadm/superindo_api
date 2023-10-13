@@ -8,11 +8,17 @@ import (
 	"time"
 
 	"project-version3/superindo-task/pkg/ehttp"
+	_cartHandler "project-version3/superindo-task/service/cart/delivery/http"
+	_cartRepo "project-version3/superindo-task/service/cart/repository/mysql"
+	_cartUseCase "project-version3/superindo-task/service/cart/usecase"
+	_categoryHandler "project-version3/superindo-task/service/category/delivery/http"
+	_categoryRepo "project-version3/superindo-task/service/category/repository/mysql"
+	_categoryUseCase "project-version3/superindo-task/service/category/usecase"
 	_productHandler "project-version3/superindo-task/service/product/delivery/http"
-	_userHandler "project-version3/superindo-task/service/user/delivery/http"
-
 	_productRepo "project-version3/superindo-task/service/product/repository/mysql"
 	_productUseCase "project-version3/superindo-task/service/product/usecase"
+	_productImageRepo "project-version3/superindo-task/service/product_image/repository/mysql"
+	_userHandler "project-version3/superindo-task/service/user/delivery/http"
 	_userRepo "project-version3/superindo-task/service/user/repository/mysql"
 	_userUseCase "project-version3/superindo-task/service/user/usecase"
 
@@ -91,18 +97,28 @@ func main() {
 		}
 	})
 
+	// setup timeout
+	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+
 	// setup repo
 	productRepo := _productRepo.NewMysqlProductRepository(gormDB)
 	userRepo := _userRepo.NewMysqlUserRepository(gormDB)
+	categoryRepo := _categoryRepo.NewMysqlCategoryRepository(gormDB)
+	productImageRepo := _productImageRepo.NewMysqlProductImageRepository(gormDB)
+	cartRepo := _cartRepo.NewMysqlCartRepository(gormDB)
 
-	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 	// setup usecase
-	productUsecase := _productUseCase.NewProductUsecase(productRepo, timeoutContext)
+	productUsecase := _productUseCase.NewProductUsecase(productRepo, categoryRepo, productImageRepo, timeoutContext)
 	userUsecase := _userUseCase.NewUserUsecase(userRepo, timeoutContext)
+	categoryUsecase := _categoryUseCase.NewCategoryUsecase(categoryRepo, timeoutContext)
+	cartUsecase := _cartUseCase.NewCartUsecase(cartRepo, productRepo, categoryRepo, productImageRepo, timeoutContext)
 
 	// setup handler
 	_productHandler.NewProductHandler(e, productUsecase)
 	_userHandler.NewUserHandler(e, userUsecase)
+	_categoryHandler.NewCategoryHandler(e, categoryUsecase)
+	_categoryHandler.NewCategoryHandler(e, categoryUsecase)
+	_cartHandler.NewCartHandler(e, cartUsecase)
 
 	log.Fatal(e.Start(viper.GetString("server.address")))
 }
