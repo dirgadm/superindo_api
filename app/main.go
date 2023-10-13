@@ -1,24 +1,27 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"net/url"
 	"time"
 
-	_productHandler "project-version3/superindo-task/product/delivery/http"
+	"project-version3/superindo-task/pkg/ehttp"
+	_productHandler "project-version3/superindo-task/service/product/delivery/http"
+	_userHandler "project-version3/superindo-task/service/user/delivery/http"
+
+	_productRepo "project-version3/superindo-task/service/product/repository/mysql"
+	_productUseCase "project-version3/superindo-task/service/product/usecase"
+	_userRepo "project-version3/superindo-task/service/user/repository/mysql"
+	_userUseCase "project-version3/superindo-task/service/user/usecase"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 	"github.com/spf13/viper"
-
-	// _articleHttpDelivery "github.com/bxcodec/go-clean-arch/article/delivery/http"
-	// _articleHttpDeliveryMiddleware "github.com/bxcodec/go-clean-arch/article/delivery/http/middleware"
-	_productRepo "project-version3/superindo-task/product/repository/mysql"
-	_productUseCase "project-version3/superindo-task/product/usecase"
-	// _articleUcase "github.com/bxcodec/go-clean-arch/article/usecase"
-	// _authorRepo "github.com/bxcodec/go-clean-arch/author/repository/mysql"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 func init() {
@@ -44,35 +47,62 @@ func main() {
 	val.Add("parseTime", "1")
 	val.Add("loc", "Asia/Jakarta")
 	dsn := fmt.Sprintf("%s?%s", connection, val.Encode())
-	dbConn, err := sql.Open(`mysql`, dsn)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	err = dbConn.Ping()
+	gormDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	sqlDB, err := gormDB.DB()
 	defer func() {
-		err := dbConn.Close()
+		err := sqlDB.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
 	}()
 
+	// setup machine and middleware
 	e := echo.New()
+	// setup cors
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowCredentials: true,
+		AllowHeaders:     []string{"Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Access-Control-Request-Headers, Access-Control-Request-Method, Connection, Host, Origin, User-Agent, Referer, Cache-Control, X-header"},
+	}))
 
-	// Middleware Usage
-	// middL := _articleHttpDeliveryMiddleware.InitMiddleware()
-	// e.Use(middL.CORS)
+	// setup echo for request id
+	e.Use(middleware.RequestID())
 
-	// authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
-	productRepo := _productRepo.NewMysqlProductRepository(dbConn)
+	// setup echo for secure
+	e.Use(middleware.Secure())
+
+	// setup echo for gzip compres
+	e.Use(middleware.Gzip())
+
+	// setup custom context
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			cc := &ehttp.Context{
+				Context:        c,
+				ResponseFormat: ehttp.NewResponse(),
+				ResponseData:   nil,
+			}
+			return next(cc)
+		}
+	})
+
+	// setup repo
+	productRepo := _productRepo.NewMysqlProductRepository(gormDB)
+	userRepo := _userRepo.NewMysqlUserRepository(gormDB)
 
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	// setup usecase
 	productUsecase := _productUseCase.NewProductUsecase(productRepo, timeoutContext)
-	_productHandler.NewProductHandler(e, productUsecase)
+	userUsecase := _userUseCase.NewUserUsecase(userRepo, timeoutContext)
 
-	log.Fatal(e.Start(viper.GetString("server.address"))) //nolint
+	// setup handler
+	_productHandler.NewProductHandler(e, productUsecase)
+	_userHandler.NewUserHandler(e, userUsecase)
+
+	log.Fatal(e.Start(viper.GetString("server.address")))
 }

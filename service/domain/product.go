@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"context"
 	"time"
 )
 
@@ -17,14 +16,14 @@ type Product struct {
 
 // ProductUsecase represent the article's usecases
 type ProductUsecase interface {
-	Fetch(ctx context.Context, cursor string, num int64) ([]Product, string, error)
-	GetByID(ctx context.Context, id int64) (Product, error)
-	Store(context.Context, *Product) error
+	// Fetch(ctx context.Context, cursor string, num int64) ([]Product, string, error)
+	// GetByID(ctx context.Context, id int64) (Product, error)
+	// Store(context.Context, *Product) error
 }
 
 // ProductRepository represent the article's repository contract
 type ProductRepository interface {
-	Fetch(ctx context.Context, cursor string, num int64) (res []Product, nextCursor string, err error)
-	GetByID(ctx context.Context, id int64) (Product, error)
-	Store(ctx context.Context, a *Product) error
+	// Fetch(ctx context.Context, cursor string, num int64) (res []Product, nextCursor string, err error)
+	// GetByID(ctx context.Context, id int64) (Product, error)
+	// Store(ctx context.Context, a *Product) error
 }

@@ -12,6 +12,9 @@
       "user": "user",
       "pass": "password",
       "name": "catalog"
+  },
+  "jwt":{
+    "key":"V3ryS3cur3!*Jwt"
   }
 
 }

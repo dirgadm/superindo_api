@@ -1,0 +1,126 @@
+package usecase
+
+import (
+	"context"
+	"time"
+
+	"project-version3/superindo-task/pkg/ehttp"
+	"project-version3/superindo-task/pkg/jwt"
+	"project-version3/superindo-task/service/domain"
+	"project-version3/superindo-task/service/domain/dto"
+
+	"github.com/spf13/viper"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type userUsecase struct {
+	userRepo domain.UserRepository
+	// authorRepo     domain.AuthorRepository
+	contextTimeout time.Duration
+}
+
+// NewUserUsecase will create new an articleUsecase object representation of domain.UserUsecase interface
+func NewUserUsecase(u domain.UserRepository, timeout time.Duration) domain.UserUsecase {
+	return &userUsecase{
+		userRepo:       u,
+		contextTimeout: timeout,
+	}
+}
+
+func (u *userUsecase) Login(ctx context.Context, req dto.LoginRequest) (res dto.AuthResponse, err error) {
+	var user domain.User
+	user, err = u.userRepo.GetByEmail(ctx, req.Email)
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		err = ehttp.ErrorOutput("email", err.Error())
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		err = ehttp.ErrorOutput("password", "The password is not match")
+		return
+	}
+
+	jwtInit := jwt.NewJWT([]byte(viper.GetString(`jwt.key`)))
+	expiredAt := time.Now().Add(time.Hour * 1)
+	claim := jwt.UserClaim{
+		UserId:    user.Id,
+		ExpiresAt: expiredAt.Unix(),
+	}
+
+	token, err := jwtInit.Create(claim)
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		return
+	}
+
+	res.Token = token
+	res.ExpiredAt = expiredAt
+	res.User = dto.UserResponse{
+		Id:          user.Id,
+		Name:        user.Name,
+		Email:       user.Email,
+		CreatedAt:   user.CreatedAt,
+		LastLoginAt: user.LastLoginAt,
+	}
+
+	return
+}
+
+func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (res dto.AuthResponse, err error) {
+	var userExist domain.User
+	userExist, _ = u.userRepo.GetByEmail(ctx, req.Email)
+	if userExist.Id != 0 {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		err = ehttp.ErrorOutput("email", "The email is already exists")
+		return
+	}
+
+	var bytes []byte
+	bytes, err = bcrypt.GenerateFromPassword([]byte(req.Password), 14)
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		return
+	}
+	passwordHash := string(bytes)
+
+	user := &domain.User{
+		Email:       req.Email,
+		Password:    passwordHash,
+		Name:        req.Name,
+		Phone:       req.Phone,
+		LastLoginAt: time.Now(),
+	}
+	err = u.userRepo.Create(ctx, user)
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		return
+	}
+
+	jwtInit := jwt.NewJWT([]byte(viper.GetString(`jwt.key`)))
+	expiredAt := time.Now().Add(time.Hour * 1)
+	claim := jwt.UserClaim{
+		UserId:    user.Id,
+		ExpiresAt: expiredAt.Unix(),
+	}
+
+	token, err := jwtInit.Create(claim)
+	if err != nil {
+		// s.opt.Common.Logger.AddMessage(log.ErrorLevel, err).Print()
+		return
+	}
+
+	res.Token = token
+	res.ExpiredAt = expiredAt
+	res.User = dto.UserResponse{
+		Id:          user.Id,
+		Name:        user.Name,
+		Email:       user.Email,
+		CreatedAt:   user.CreatedAt,
+		LastLoginAt: user.LastLoginAt,
+	}
+
+	return
+}

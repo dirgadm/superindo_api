@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"project-version3/superindo-task/domain"
+	"project-version3/superindo-task/service/domain"
 )
 
 type productUsecase struct {
@@ -23,28 +23,28 @@ func NewProductUsecase(a domain.ProductRepository, timeout time.Duration) domain
 }
 
 func (a *productUsecase) Fetch(c context.Context, cursor string, num int64) (res []domain.Product, nextCursor string, err error) {
-	if num == 0 {
-		num = 10
-	}
+	// if num == 0 {
+	// 	num = 10
+	// }
 
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	// defer cancel()
 
-	res, nextCursor, err = a.productRepo.Fetch(ctx, cursor, num)
-	if err != nil {
-		return nil, "", err
-	}
+	// res, nextCursor, err = a.productRepo.Fetch(ctx, cursor, num)
+	// if err != nil {
+	// 	return nil, "", err
+	// }
 	return
 }
 
 func (a *productUsecase) GetByID(c context.Context, id int64) (res domain.Product, err error) {
-	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	// defer cancel()
 
-	res, err = a.productRepo.GetByID(ctx, id)
-	if err != nil {
-		return
-	}
+	// res, err = a.productRepo.GetByID(ctx, id)
+	// if err != nil {
+	// 	return
+	// }
 	return
 }
 

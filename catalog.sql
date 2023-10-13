@@ -88,11 +88,11 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(100) DEFAULT '',
-  `phone_number` varchar(15) DEFAULT '',
+  `phone` varchar(15) DEFAULT '',
   `password` varchar(250) DEFAULT '',
   `name` varchar(100) DEFAULT '',
   `status` tinyint(1) DEFAULT '0',
-  `last_login_at` timestamp NULL DEFAULT NULL,
+  `last_login_at` datetime NULL DEFAULT NULL,
   `login_token` text,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -105,7 +105,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user`(`email`,`phone_number`,`password`,`name`,`status`,`created_at`)
+INSERT INTO `user`(`email`,`phone`,`password`,`name`,`status`,`created_at`)
 VALUES('ardi@example.com','0811223344','xcvxcvb1231233','ardi',1,NOW()),
 ('atun@example.com','0812345678','xcvxcvb1231233','atun wati',1,NOW()),
 ('joy@example.com','0813456789','xcvxcvb1231233','joy boy',1,NOW());
