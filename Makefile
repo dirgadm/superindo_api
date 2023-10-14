@@ -7,11 +7,14 @@ MYSQL_DATABASE ?= catalog
 # ~~~ Development Environment ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 up: dev-env dev-air             ## Startup / Spinup Docker Compose and air
+mysql: dev-env 
+air: dev-air
 down: docker-stop               ## Stop Docker
 destroy: docker-teardown clean  ## Teardown (removes volumes, tmp files, etc...)
 
 dev-env: ## Bootstrap Environment (with a Docker-Compose help).
-	@ docker-compose up -d --build mysql
+	## @ docker-compose up -d --build mysql
+	@ docker-compose -f compose.yaml up --detach
 
 dev-air: $(AIR) ## Starts AIR ( Continuous Development app).
 	air

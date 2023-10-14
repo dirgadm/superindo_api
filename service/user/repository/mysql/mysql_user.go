@@ -21,13 +21,11 @@ func (m *mysqlUserRepository) GetDetail(ctx context.Context, id int) (user domai
 }
 
 func (m *mysqlUserRepository) GetByEmail(ctx context.Context, email string) (user domain.User, err error) {
-	// db := m.opt.Common.Database.Read
 	err = m.Conn.Where("email = ?", email).First(&user).Error
 	return
 }
 
 func (m *mysqlUserRepository) Create(ctx context.Context, user *domain.User) (err error) {
-	// db := m.opt.Common.Database.Read
 	err = m.Conn.Create(user).Error
 	return
 }

@@ -1,7 +1,8 @@
 version: "3.7"
 services:
   web:
-    image: go-clean-arch
+    image: dirgadm/go-clean-arch:1
+    restart: always
     container_name: superindo_task_api
     ports:
       - 9090:9090
@@ -10,6 +11,8 @@ services:
         condition: service_healthy
     volumes:
       - ./config.json:/app/config.json
+    networks:
+      - network-bridge
 
   mysql:
     image: mysql:5.7
@@ -26,5 +29,11 @@ services:
       - MYSQL_ROOT_PASSWORD=root
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 5s
+      interval: 5s
       retries: 10
+    networks:
+      - network-bridge
+networks:
+  network-bridge:
+    driver: bridge
+    
