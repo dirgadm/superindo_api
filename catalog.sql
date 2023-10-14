@@ -1,6 +1,6 @@
 CREATE DATABASE  IF NOT EXISTS `catalog` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
 USE `catalog`;
--- MySQL dump 10.13  Distrib 5.7.17, for macos10.12 (x86_64)
+-- MySQL dump 
 --
 -- Host: localhost    Database: catalog
 -- ------------------------------------------------------
@@ -24,15 +24,19 @@ USE `catalog`;
 DROP TABLE IF EXISTS `product`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `product` (
-  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) DEFAULT '',
-  `description` text NOT NULL,
-  `price` decimal(10,2) DEFAULT '0.00',
-  `status` tinyint(1) NOT NULL DEFAULT '0',
-  `updated_at` timestamp NULL DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `product`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `code` varchar(32) NULL DEFAULT NULL,
+  `name` varchar(100) NULL DEFAULT NULL,
+  `description` text NULL,
+  `category_id` bigint(11) NULL DEFAULT NULL,
+  `weight` decimal(10, 2) NULL DEFAULT NULL,
+  `price` decimal(10, 2) NULL DEFAULT NULL,
+  `stock` int NULL DEFAULT NULL,
+  `status` int NULL DEFAULT NULL COMMENT '1:active,2:inactive',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -42,40 +46,68 @@ CREATE TABLE `product` (
 
 LOCK TABLES `product` WRITE;
 /*!40000 ALTER TABLE `product` DISABLE KEYS */;
-INSERT INTO `product`(`name`,`description`,`price`,`status`,`updated_at`,`created_at`)
-VALUES('Mangga','Mengandung Vitamin C yang tinggi, Berwarna oranye terang','35000',1,NOW(),NOW()),
-('Rambutan','Berwarna merah terang','15000',1,NOW(),NOW()),
-('Susu','Mengandung kalsium','30000',1,NOW(),NOW()),
-('Bawang Merah','Beraroma harum','20000',1,NOW(),NOW());
+INSERT INTO `product` VALUES (1, 'PRD0001', 'Product 1', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 2, 3600.00, 34000.00, 100, 1, '2023-10-14 23:48:51', '2023-10-14 23:50:02');
+INSERT INTO `product` VALUES (2, 'PRD0002', 'Product 2', 'Lorem Ipsum is simply dummy text of the printing and typesetting industry.', 3, 9100.00, 72000.00, 100, 1, '2023-10-14 23:48:53', '2023-10-14 23:50:02');
 /*!40000 ALTER TABLE `product` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `product_category`
+-- Table structure for table `product_image`
 --
 
-DROP TABLE IF EXISTS `product_category`;
+DROP TABLE IF EXISTS `product_image`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `product_category` (
-  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
-  `product_id` bigint unsigned DEFAULT NULL,
-  `category_id` bigint unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`product_id`) REFERENCES `product`(`id`),
-  FOREIGN KEY (`category_id`) REFERENCES `category`(`id`)
+CREATE TABLE `product_image`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `product_id` bigint(11) NULL DEFAULT NULL,
+  `image_url` text NULL,
+  `main_image` int NULL DEFAULT NULL COMMENT '1:yes,2:no',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `product_category`
+-- Dumping data for table `product`
 --
 
-LOCK TABLES `product_category` WRITE;
-/*!40000 ALTER TABLE `product_category` DISABLE KEYS */;
-INSERT INTO `product_category`(`product_id`,`category_id`)
-VALUES(1,2),(2,2),(3,1),(4,3);
-/*!40000 ALTER TABLE `product_category` ENABLE KEYS */;
+LOCK TABLES `product_image` WRITE;
+/*!40000 ALTER TABLE `product_image` DISABLE KEYS */;
+INSERT INTO `product_image` 
+VALUES (1, 1, 'https://api.dicebear.com/7.x/icons/svg?seed=Lilly', 1, '2023-10-14 23:51:50', NULL);
+/*!40000 ALTER TABLE `product_image` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `category`
+--
+
+DROP TABLE IF EXISTS `category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `category`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NULL DEFAULT NULL,
+  `icon_url` text NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `category`
+--
+
+LOCK TABLES `category` WRITE;
+/*!40000 ALTER TABLE `category` DISABLE KEYS */;
+INSERT INTO `category` VALUES (1, 'Buah & Sayur', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:00', '2023-10-14 17:49:42');
+INSERT INTO `category` VALUES (2, 'Snack & Ice Cream', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:09', '2023-10-14 17:49:42');
+INSERT INTO `category` VALUES (3, 'Minuman', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:13', '2023-10-14 17:49:42');
+/*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -113,33 +145,33 @@ VALUES('ardi@example.com','0811223344','xcvxcvb1231233','ardi',1,NOW()),
 UNLOCK TABLES;
 
 --
--- Table structure for table `category`
+-- Table structure for table `cart`
 --
 
-DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `cart`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `category` (
-  `id` bigint(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(50) DEFAULT '',
-  `status` tinyint(1) DEFAULT '0',
-  `created_at` datetime DEFAULT NULL,
-  `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+CREATE TABLE `cart`  (
+  `id` bigint(11) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(11) NULL DEFAULT NULL,
+  `product_id` bigint(11) NULL DEFAULT NULL,
+  `qty` int NULL DEFAULT NULL,
+  `status` int NULL DEFAULT NULL COMMENT '1:active,2:inactive',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `category`
+-- Dumping data for table `cart`
 --
 
-LOCK TABLES `category` WRITE;
-/*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category`(`name`,`status`,`updated_at`,`created_at`)
-VALUES('Dairy',1,NOW(),NOW()),
-('Fruits',1,NOW(),NOW()),
-('Onion',1,NOW(),NOW());
-/*!40000 ALTER TABLE `category` ENABLE KEYS */;
+LOCK TABLES `cart` WRITE;
+/*!40000 ALTER TABLE `cart` DISABLE KEYS */;
+INSERT INTO `cart` VALUES (1, 1, 1, 11, 1, '2023-10-14 23:56:29', '2023-10-14 23:56:29');
+/*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
