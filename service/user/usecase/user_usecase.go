@@ -33,7 +33,7 @@ func (u *userUsecase) Login(ctx context.Context, req dto.LoginRequest) (res dto.
 	user, err = u.userRepo.GetByEmail(ctx, req.Email)
 	if err != nil {
 		log.Error(err)
-		err = ehttp.ErrorOutput("email", err.Error())
+		err = ehttp.ErrorOutput("email", "The email is not match")
 		return
 	}
 
