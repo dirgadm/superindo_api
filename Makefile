@@ -9,6 +9,7 @@ MYSQL_DATABASE ?= catalog
 up: dev-env ##dev-air           ## Startup / Spinup Docker Compose and air
 down: docker-stop               ## Stop Docker
 destroy: docker-teardown clean  ## Teardown (removes volumes, tmp files, etc...)
+log: docker-log  ## Teardown (removes volumes, tmp files, etc...)
 
 dev-env: ## Bootstrap Environment (with a Docker-Compose help).
 	@ docker compose -f compose.yaml up --detach
@@ -21,6 +22,9 @@ docker-stop:
 
 docker-teardown:
 	@ docker-compose down --remove-orphans -v
+
+docker-log:
+	@ docker logs -f superindo_task_api
 
 # ~~~ Cleans ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
