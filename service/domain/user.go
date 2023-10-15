@@ -13,6 +13,7 @@ type User struct {
 	Password    string
 	Name        string
 	Phone       string
+	Status      int
 	CreatedAt   time.Time
 	LastLoginAt time.Time
 }
@@ -32,4 +33,5 @@ type UserRepository interface {
 	GetDetail(ctx context.Context, id int) (user User, err error)
 	GetByEmail(ctx context.Context, email string) (user User, err error)
 	Create(ctx context.Context, user *User) (err error)
+	Update(ctx context.Context, user *User) (err error)
 }

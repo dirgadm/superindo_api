@@ -57,6 +57,21 @@ func (u *userUsecase) Login(ctx context.Context, req dto.LoginRequest) (res dto.
 		return
 	}
 
+	us := &domain.User{
+		Id:          user.Id,
+		Email:       user.Email,
+		Password:    user.Password,
+		Name:        user.Name,
+		Phone:       user.Phone,
+		Status:      user.Status,
+		CreatedAt:   user.CreatedAt,
+		LastLoginAt: time.Now(),
+	}
+	if err = u.userRepo.Update(ctx, us); err != nil {
+		log.Error(err)
+		return
+	}
+
 	res.Token = token
 	res.ExpiredAt = expiredAt
 	res.User = dto.UserResponse{
@@ -78,6 +93,11 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 		err = ehttp.ErrorOutput("email", "The email is already exists")
 		return
 	}
+	if req.Phone[:3] != "+62" {
+		log.Error(err)
+		err = ehttp.ErrorOutput("phone", "The phone number should be start with +62")
+		return
+	}
 
 	var bytes []byte
 	bytes, err = bcrypt.GenerateFromPassword([]byte(req.Password), 14)
@@ -92,6 +112,7 @@ func (u *userUsecase) Register(ctx context.Context, req dto.RegisterRequest) (re
 		Password:    passwordHash,
 		Name:        req.Name,
 		Phone:       req.Phone,
+		Status:      1,
 		LastLoginAt: time.Now(),
 	}
 	err = u.userRepo.Create(ctx, user)

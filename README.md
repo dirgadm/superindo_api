@@ -4,7 +4,7 @@
     Docker versi 24.0.6 [https://docs.docker.com/desktop/install/windows-install/]
     Docker-Compose versi v2.21.0-desktop.1
     Postman
-    Golang go1.19 linux/amd64
+    Golang go1.19
 
 # To Do
     install docker dan docker-compose

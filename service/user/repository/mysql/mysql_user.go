@@ -29,3 +29,8 @@ func (m *mysqlUserRepository) Create(ctx context.Context, user *domain.User) (er
 	err = m.Conn.Create(user).Error
 	return
 }
+
+func (m *mysqlUserRepository) Update(ctx context.Context, user *domain.User) (err error) {
+	err = m.Conn.Save(user).Error
+	return
+}

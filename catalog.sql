@@ -104,8 +104,8 @@ CREATE TABLE `category`  (
 
 LOCK TABLES `category` WRITE;
 /*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category` VALUES (1, 'Buah & Sayur', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:00', '2023-10-14 17:49:42');
-INSERT INTO `category` VALUES (2, 'Snack & Ice Cream', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:09', '2023-10-14 17:49:42');
+INSERT INTO `category` VALUES (1, 'Makanan', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:00', '2023-10-14 17:49:42');
+INSERT INTO `category` VALUES (2, 'Peralatan Dapur', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:09', '2023-10-14 17:49:42');
 INSERT INTO `category` VALUES (3, 'Minuman', 'https://api.dicebear.com/5.x/icons/svg?icon=box', '2023-10-14 17:45:13', '2023-10-14 17:49:42');
 /*!40000 ALTER TABLE `category` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -137,9 +137,9 @@ CREATE TABLE `user` (
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
 INSERT INTO `user`(`email`,`phone`,`password`,`name`,`status`,`created_at`)
-VALUES('ardi@example.com','0811223344','xcvxcvb1231233','ardi',1,NOW()),
-('atun@example.com','0812345678','xcvxcvb1231233','atun wati',1,NOW()),
-('joy@example.com','0813456789','xcvxcvb1231233','joy boy',1,NOW());
+VALUES('ardi@example.com','+6281122334444','$2a$14$taBX9l6UqoiQBT2oi0AM3eqDYO2CFBqIYPQY1AomrT0MQzkbt7Rmy','ardi',1,NOW()),
+('atun@example.com','+6281122334444','$2a$14$taBX9l6UqoiQBT2oi0AM3eqDYO2CFBqIYPQY1AomrT0MQzkbt7Rmy','atun wati',1,NOW()),
+('joy@example.com','+6281122334444','$2a$14$taBX9l6UqoiQBT2oi0AM3eqDYO2CFBqIYPQY1AomrT0MQzkbt7Rmy','joy boy',1,NOW());
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
