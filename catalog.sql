@@ -125,7 +125,6 @@ CREATE TABLE `user` (
   `name` varchar(100) DEFAULT '',
   `status` tinyint(1) DEFAULT '0',
   `last_login_at` datetime NULL DEFAULT NULL,
-  `login_token` text,
   `created_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -170,7 +169,7 @@ CREATE TABLE `cart`  (
 
 LOCK TABLES `cart` WRITE;
 /*!40000 ALTER TABLE `cart` DISABLE KEYS */;
-INSERT INTO `cart` VALUES (1, 1, 1, 11, 1, '2023-10-14 23:56:29', '2023-10-14 23:56:29');
+INSERT INTO `cart` VALUES (1, 4, 1, 11, 1, '2023-10-14 23:56:29', '2023-10-14 23:56:29');
 /*!40000 ALTER TABLE `cart` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
